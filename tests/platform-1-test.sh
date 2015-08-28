@@ -46,8 +46,8 @@ it_deploys_deis_platform() {
 
   deploy-deis
   
-  [ ${etcd_checked} ] &&
-  [ ${deis_built} ] &&
+  [ ${etcd_checked} ]
+  [ ${deis_built} ]
   [ ${cluster_checked} ]
 }
 

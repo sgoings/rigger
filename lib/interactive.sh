@@ -6,20 +6,34 @@ function choice-prompt {
 
   local default_text="${options[$(expr ${default} - 1)]}"
 
-  rerun_log "-> ${question} [ ${default_text} ]"
+  local input
+  while [ -z "${input:-}" ]; do
 
-  for ((i=0; i < ${#options[@]}; i++))
-  do
-    echo "$(expr ${i} + 1)) ${options[$i]}"
+    # prompt
+    rerun_log "-> ${question} [ ${default_text} ]"
+
+    for ((i=0; i < ${#options[@]}; i++))
+    do
+      echo "$(expr ${i} + 1)) ${options[$i]}"
+    done
+
+    echo -n "#? "
+
+    # answer
+    read input
+
+    if [ -z "${input}" ]; then
+      input="${default}"
+    fi
+
+    if [[ ${input:-} -le ${#options[@]} ]]; then
+      eval "${return_var}=${input}"
+      rerun_log warn "You chose: ${input}) ${options[$(expr ${!return_var} - 1)]}"
+    else
+      rerun_log warn "You chose: ${input}) which is invalid."
+      input=""
+    fi
   done
-
-  echo -n "#? "
-
-  read input
-
-  eval ${return_var}=${input:-${default}}
-
-  echo "You chose: ${!return_var}) ${options[$(expr ${!return_var} - 1)]}"
 }
 
 function prompt {

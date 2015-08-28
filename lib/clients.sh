@@ -1,8 +1,10 @@
 function setup-clients {
   local version="${1}"
-
-  rerun_log "Installing clients (version: ${version})"
   
+  if [[ ${BUILD_TYPE:-} -eq 2 ]]; then
+    version="from-path"
+  fi
+
   setup-deis-client "${version}"
   setup-deisctl-client "${version}"
 
@@ -15,11 +17,11 @@ function download-client {
   local version="${2}"
   local dir="${3}"
 
-  {
-    mkdir -p "${dir}"
+  mkdir -p "${dir}"
+  (
     cd "${dir}"
     curl -sSL "http://deis.io/${client}/install.sh" | sh -s "${version}"
-  }
+  )
 }
 
 function setup-go-dependencies {
@@ -33,10 +35,8 @@ function build-deis-client {
 
   rerun_log "Building deis-cli locally at ${dir} ..."
 
-  {
+  (
     cd "${dir}"
-
-    update-repo "${dir}" "${version}"
 
     setup-go-dependencies
     make -C client build
@@ -51,8 +51,7 @@ function build-deis-client {
     else
       rerun_die "No client available"
     fi
-
-  }
+  )
 }
 
 function setup-deis-client {
@@ -64,17 +63,38 @@ function setup-deis-client {
 
   rerun_log "Installing deis-cli (${version}) at ${DEISCLI_BIN}..."
 
-  if is-released-version "${version}" ; then
+  if [ -z "${BUILD_TYPE:-}" ]; then
     download-client "deis-cli" "${version}" "${DEIS_TEST_ROOT}/${version}"
   else
     build-deis-client "${version}" "${DEIS_ROOT}"
   fi
 
-  rerun_log "Linking ${DEISCLI_BIN} -> ${DEIS_TEST_ROOT}/${version}/deis"
-  mkdir -p "${DEIS_BIN_DIR}"
-  ln -sf "${DEIS_TEST_ROOT}/${version}/deis" "${DEISCLI_BIN}"
+  link-client "${DEISCLI_BIN}" "${DEIS_TEST_ROOT}/${version}/deis" 
 
   save-var DEIS_PROFILE
+}
+
+function move-units {
+  local version="${1}"
+
+  rerun_log "Moving unit files to ${DEISCTL_UNITS}"
+  rm -rf "${DEIS_TEST_ROOT}/${version}/units"
+  mkdir -p "${DEIS_TEST_ROOT}/${version}/units"
+  mv ${HOME}/.deis/units/* "${DEIS_TEST_ROOT}/${version}/units/"
+}
+
+function link-client {
+  local link="${1}"
+  local file="${2}"
+
+  rerun_log "Linking ${link} -> ${file}"
+  mkdir -p "$(dirname ${link})"
+  ln -sf "${file}" "${link}"
+}
+
+function link-units {
+  rerun_log "Linking ${DEISCTL_UNITS} -> ${DEIS_TEST_ROOT}/${version}/units"
+  ln -sf "${DEIS_TEST_ROOT}/${version}/units" "${DEISCTL_UNITS}" 
 }
 
 function build-deisctl {
@@ -83,48 +103,40 @@ function build-deisctl {
 
   rerun_log "Building deisctl locally at ${dir} ..."
 
-  {
+  (
     cd "${dir}"
 
     setup-go-dependencies
-    update-repo "${dir}" "${version}"
     make -C deisctl build
 
     rerun_log "Installing deisctl at ${DEISCTL_BIN}"
     mkdir -p "${DEIS_TEST_ROOT}/${version}/units"
     cp "deisctl/deisctl" "${DEIS_TEST_ROOT}/${version}/deisctl"
     cp -r deisctl/units/* "${DEIS_TEST_ROOT}/${version}/units"
-  }
+  )
 }
 
 function setup-deisctl-client {
   local version="${1}"
 
-  if is-released-version "${version}" ; then
+  if [ -z "${BUILD_TYPE:-}" ]; then
     download-client "deisctl" "${version}" "${DEIS_TEST_ROOT}/${version}"
-
-    rerun_log "Moving unit files to ${DEISCTL_UNITS}"
-    mkdir -p "${DEIS_TEST_ROOT}/${version}/units"
-    mv ${HOME}/.deis/units/* "${DEIS_TEST_ROOT}/${version}/units/"
+    move-units "${version}"
   else
     build-deisctl "${version}" "${DEIS_ROOT}"
   fi
 
-  rerun_log "Linking ${DEISCTL_BIN} -> ${DEIS_TEST_ROOT}/${version}/deis"
-  mkdir -p "${DEIS_BIN_DIR}"
-  ln -sf "${DEIS_TEST_ROOT}/${version}/deisctl" "${DEISCTL_BIN}"
-
-  rerun_log "Linking ${DEISCTL_UNITS} -> ${DEIS_TEST_ROOT}/${version}/units"
-  ln -sf "${DEIS_TEST_ROOT}/${version}/units" "${DEISCTL_UNITS}" 
+  link-client "${DEISCTL_BIN}" "${DEIS_TEST_ROOT}/${version}/deisctl"
+  link-units
 }
 
 function update-repo {
   local dir="${1}"
   local version="${2}"
 
-  {
+  (
     cd "${dir}"
     git fetch
     git checkout "${version}"
-  }
+  )
 }

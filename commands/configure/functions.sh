@@ -1,26 +1,40 @@
-function choose-deis-version {
+function choose-build-type {
+  export BUILD_TYPE
+  local options=(
+                  "full platform"
+                  "clients only"
+                )
 
-  :
+  choice-prompt "What would you like me to build out of that repository?" options[@] 1 BUILD_TYPE
 
-  # local options=(
-  #                 "Released version"
-  #                 "Official GitHub Repository"
-  #               )
-
-  # choice-prompt "What Deis would you like to use?" options[@] 1 answer
-
-  # case ${answer} in
-  #   1)
-  #     prompt "Enter Deis version:" VERSION 1.9.0
-  #     ;;
-  #   2)
-  #     prompt "Enter Deis branch/tag/sha1:" VERSION master
-  #     ;;
-  # esac
+  case ${BUILD_TYPE} in
+    2) # clients only
+      configure-deis-version
+      ;;
+  esac
 }
 
-function need-deis-repo {
-  ! is-released-version "${VERSION}"
+function configure-user-type {
+  local answer
+  local options=(
+                  "Release"
+                  "Path"
+                )
+
+  choice-prompt "Where can I find the version of Deis you want?" options[@] 1 answer
+
+  case ${answer} in
+    1) # released version
+      configure-deis-version
+      ;;
+    2) # path based version
+      choose-build-type
+      ;;
+    3)
+  esac
+  
+  possible_vars+=" BUILD_TYPE"
+  possible_vars+=" VERSION"
 }
 
 function configure-deisctl-tunnel {
@@ -28,7 +42,11 @@ function configure-deisctl-tunnel {
 }
 
 function configure-deis-version {
-  prompt "Enter Deis version:" VERSION master
+  prompt "Enter Deis version:" VERSION 1.10.0
+}
+
+function configure-deis-repo-sha {
+  prompt "Enter Deis repo sha:" DEIS_GIT_VERSION master
 }
 
 function configure-go {
@@ -50,7 +68,7 @@ function configure-ipaddr {
 }
 
 function configure-registry {
-  case ${PROVIDER} in
+  case ${PROVIDER:-} in
     vagrant)
       prompt "Where can I find your Docker registry?" DEV_REGISTRY "$(guess-registry)"
       ;;
@@ -78,16 +96,20 @@ function configure-provider {
     local options=(
                     "Vagrant"
                     "Amazon Web Services (AWS)"
+                    "Digital Ocean"
                   )
-
+    local answer
     choice-prompt "What cloud provider would you like to use?" options[@] 1 answer
 
-    case ${answer} in
+    case "${answer:-}" in
       1)
         PROVIDER=vagrant
         ;;
       2)
         PROVIDER=aws
+        ;;
+      3)
+        PROVIDER=digitalocean
         ;;
     esac
   fi

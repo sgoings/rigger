@@ -8,10 +8,8 @@
     return 1
 }
 
-# Check usage. Argument should be command name.
 [[ $# = 1 ]] || rerun_option_usage
 
-# Source the option parser script.
 #
 if [[ -r $RERUN_MODULE_DIR/commands/$1/options.sh ]] 
 then
@@ -20,27 +18,23 @@ then
     }
 fi
 
-# - - -
-# Your functions declared here.
-# - - -
+function is-released-version {
+  [[ ${1} =~ ^([0-9]+\.){0,2}[0-9]$ ]] && return 0
+}
 
 function check-registry {
-  if ! curl -s $DEV_REGISTRY 1> /dev/null && ! curl -s https://$DEV_REGISTRY 1> /dev/null; then
+  if ! curl -s "${DEV_REGISTRY}" 1> /dev/null && ! curl -s "https://${DEV_REGISTRY}" 1> /dev/null; then
     rerun_log error "DEV_REGISTRY is not accessible, exiting..."
     exit 1
   fi
-}
-
-function not-implemented {
-  rerun_log "No implementation of ${FUNCNAME[1]} in ${PROVIDER}"
 }
 
 function setup-provider {
 # This loads the provider's implementations of the provider interface
   local provider="${1}"
 
-  source "${PROVIDER_DIR}/interface.sh"
-  source "${PROVIDER_DIR}/${provider}.sh"
+  source "providers/interface.sh"
+  _load-provider-config
 }
 
 function setup-upgrader {
@@ -48,6 +42,14 @@ function setup-upgrader {
 
   source "${UPGRADER_DIR}/interface.sh"
   source "${UPGRADER_DIR}/${upgrader}.sh"
+}
+
+function render-shell-template {
+  local command=$(echo -e "cat <<TEMPLATE
+$(< "${1}")
+TEMPLATE
+")
+  eval "${command}"
 }
 
 function source-shared {
@@ -107,10 +109,6 @@ function update-link {
   else
     rerun_die "${file} does not exist."
   fi
-}
-
-function is-released-version {
-  [[ ${1} =~ ^([0-9]+\.){0,2}[0-9]$ ]] && return 0
 }
 
 function save-env {
