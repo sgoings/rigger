@@ -84,12 +84,18 @@ else
 
   possible_vars=""
 
-  echo
-  rerun_log warn "General questions..."
-  echo "------------------"
+  identify-user-type
 
   configure-deis-version
   possible_vars+=" VERSION"
+
+  if [ $CLUSTER_TYPE -eq 1 ]; then
+    # test cluster
+    echo "Test Cluster!"
+  else
+    # development cluster
+    echo "Dev Cluster!"
+  fi
 
   configure-go
   possible_vars+=" GOPATH"
