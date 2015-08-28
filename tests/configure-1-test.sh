@@ -17,7 +17,7 @@ it_fails_to_load_existing_config() {
 }
 
 xit_can_configure_against_existing_cluster() {
-  VERSION="1.9.0" DEISCTL_TUNNEL="127.0.0.1" ../rerun deis:configure --type existing
+  DEIS_VERSION="1.9.0" DEISCTL_TUNNEL="127.0.0.1" ../rerun deis:configure --type existing
 }
 
 it_loads_existing_config() {
@@ -54,7 +54,7 @@ EOF
              ORIGINAL_PATH
              PROVIDER
              PATH
-             VERSION"
+             DEIS_VERSION"
 
   for var in ${vars_list}; do
     sed -i -e "/^export ${var}=.*$/d" "${temp_vars_file}"

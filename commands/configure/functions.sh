@@ -19,16 +19,12 @@ function choose-deis-version {
   # esac
 }
 
-function need-deis-repo {
-  ! is-released-version "${VERSION}"
-}
-
 function configure-deisctl-tunnel {
   prompt "Enter Deisctl tunnel IP address:" DEISCTL_TUNNEL 127.0.0.1:2222
 }
 
 function configure-deis-version {
-  prompt "Enter Deis version:" VERSION master
+  prompt "Enter Deis version:" DEIS_VERSION 1.10.0
 }
 
 function configure-go {
@@ -78,6 +74,7 @@ function configure-provider {
     local options=(
                     "Vagrant"
                     "Amazon Web Services (AWS)"
+                    "Digital Ocean"
                   )
 
     choice-prompt "What cloud provider would you like to use?" options[@] 1 answer
@@ -88,6 +85,9 @@ function configure-provider {
         ;;
       2)
         PROVIDER=aws
+        ;;
+      3)
+        PROVIDER=digitalocean
         ;;
     esac
   fi

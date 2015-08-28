@@ -9,6 +9,11 @@ STACK_TAG="${STACK_TAG:-test}-${DEIS_TEST_ID}"
 export DEIS_NUM_INSTANCES=${DEIS_NUM_INSTANCES:-3}
 export STACK_NAME="${STACK_NAME:-deis-${STACK_TAG}}"
 
+function configure-provider {
+  prompt "Enter your AWS key:" AWS_ACCESS_KEY_ID
+  prompt "Enter your AWS secret key:" AWS_SECRET_ACCESS_KEY
+}
+
 function _setup-provider-dependencies {
   # install python requirements for this script
   pip install --disable-pip-version-check awscli boto docopt

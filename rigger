@@ -23,4 +23,9 @@ fi
 export RERUN_COLOR=true
 export RERUN_MODULES="${THIS_DIR}/..:${THIS_DIR}/tmp/rerun/modules"
 
+if [ -f ${HOME}/.rigger/${USER} ]; then
+  #echo "Loading defaults from ${HOME}/.rigger/${USER}..."
+  source "${HOME}/.rigger/${USER}"
+fi
+
 "${RERUN_HOME}/rerun" rigger:$@

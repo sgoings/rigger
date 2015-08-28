@@ -40,7 +40,9 @@ function setup-provider {
   local provider="${1}"
 
   source "${PROVIDER_DIR}/interface.sh"
-  source "${PROVIDER_DIR}/${provider}.sh"
+  if [ -f "${PROVIDER_DIR}/${provider}.sh" ]; then
+    source "${PROVIDER_DIR}/${provider}.sh"
+  fi
 }
 
 function setup-upgrader {
@@ -116,7 +118,7 @@ function save-env {
                   ORIGINAL_PATH
                   PATH
                   DEIS_TEST_ROOT
-                  VERSION"
+                  DEIS_VERSION"
 
   mkdir -p "${DEIS_TEST_ROOT}"
   cat /dev/null > "${DEIS_VARS_FILE}"
