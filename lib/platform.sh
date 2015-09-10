@@ -13,10 +13,11 @@ function checkout-deis {
       git fetch
       git fetch --tags
       git checkout ${version}
+      git pull origin ${version}
     )
   else
     rerun_log "Cloning Deis at ${dir} to ${version}"
-    git clone -b "${version}" https://github.com/deis/deis.git "${dir}"
+    git clone --depth 1 -b "${version}" https://github.com/deis/deis.git "${dir}"
   fi
 }
 

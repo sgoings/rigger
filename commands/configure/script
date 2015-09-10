@@ -30,14 +30,16 @@ else
   configure-deis-root
   possible_vars+=" DEIS_ROOT"
 
+  source-config
+
+  if [ ${DEIS_SOURCE} -ne 2 ]; then
+    checkout-deis "${DEIS_ROOT}" "${DEIS_GIT_VERSION:-VERSION}"
+  fi
+
   configure-provider
   possible_vars+=" PROVIDER"
 
-  source-config
-
   setup-provider "${PROVIDER:-}"
-
-  configure-provider
 
   # if platform is being built, we need a registry
   if [[ ${BUILD_TYPE:-} -eq 1 ]]; then

@@ -18,23 +18,36 @@ function configure-user-type {
   local answer
   local options=(
                   "Release"
-                  "Path"
+                  "Path (I'll just build whatever you have here)"
+                  "Git (I'll manage the Git repo in a path of your choosing)"
                 )
 
-  choice-prompt "Where can I find the version of Deis you want?" options[@] 1 answer
+  choice-prompt "Where can I find the version of Deis you want?" options[@] 1 DEIS_SOURCE
 
-  case ${answer} in
+  case ${DEIS_SOURCE} in
     1) # released version
       configure-deis-version
+      export GOPATH="${DEIS_TEST_ROOT}/go"
+      export DEIS_ROOT="${GOPATH}/src/github.com/deis/deis"
       ;;
     2) # path based version
       choose-build-type
       ;;
-    3)
+    3) # Git based version
+      prompt "Enter Deis git repo url:" DEIS_GIT_REPO "https://github.com/deis/deis.git"
+      prompt "Enter Deis git branch/tag/sha1:" DEIS_GIT_VERSION "master"
+      choose-build-type
+      export GOPATH="${DEIS_TEST_ROOT}/go"
+      export VERSION="${VERSION:-${DEIS_GIT_VERSION}}"
+      ;;
   esac
   
-  possible_vars+=" BUILD_TYPE"
-  possible_vars+=" VERSION"
+  export DEIS_SOURCE
+  possible_vars+=" DEIS_GIT_REPO
+                  DEIS_GIT_VERSION
+                  BUILD_TYPE
+                  DEIS_SOURCE
+                  VERSION"
 }
 
 function configure-deisctl-tunnel {
@@ -53,7 +66,7 @@ function configure-go {
   ORIGINAL_PATH="${PATH}"
   export ORIGINAL_PATH
 
-  prompt "What's your GOPATH?" GOPATH "${HOME}/go"
+  prompt "What's your GOPATH?" GOPATH "${SUGGEST_GOPATH}"
 
   export PATH="${GOPATH}/bin:${PATH}"
 }
@@ -93,24 +106,24 @@ function configure-dns {
 
 function configure-provider {
   if [ -z "${PROVIDER:-}" ]; then
-    local options=(
-                    "Vagrant"
-                    "Amazon Web Services (AWS)"
-                    "Digital Ocean"
-                  )
+
+    declare -a options
+
+    local search_return
+    search_return="$(find ${PROVIDER_DIR} -name create.sh -type f)"
+
+    if [ -z "${search_return:-}" ]; then
+      rerun_log fatal "No providers compatible with rigger found in ${PROVIDER_DIR}. :-("
+      exit 1
+    fi
+
+    for provider in ${search_return}; do
+      options+=("$(basename $(dirname ${search_return}))")
+    done
+
     local answer
     choice-prompt "What cloud provider would you like to use?" options[@] 1 answer
 
-    case "${answer:-}" in
-      1)
-        PROVIDER=vagrant
-        ;;
-      2)
-        PROVIDER=aws
-        ;;
-      3)
-        PROVIDER=digitalocean
-        ;;
-    esac
+    export PROVIDER="${answer}"
   fi
 }
