@@ -1,6 +1,6 @@
 #!/usr/bin/env roundup
 #
-#/ usage:  rerun stubbs:test -m deis -p configure [--answers <>]
+#/ usage:  rerun stubbs:test -m rigger -p configure [--answers <>]
 #
 
 [[ -f ./functions.sh ]] && . ./functions.sh
@@ -29,17 +29,16 @@ EOF
   rigger configure --file "${temp_vars_file}"
 }
 
-it_creates_minimum_config_for_git_style() {
-  rigger configure <<EOF
-2
-EOF
-
-  check-file-for-extras DEIS_GIT_VERSION
-}
-
 it_creates_minimum_config_for_released() {
   rigger configure <<EOF
 1
+
+
+
+1
+
+
+
 EOF
 
   check-file-for-extras 
@@ -58,7 +57,6 @@ function check-file-for-extras {
                        DEIS_TEST_AUTH_KEY
                        DEIS_TEST_SSH_KEY
                        DEIS_TEST_DOMAIN
-                       DEV_REGISTRY
                        GOPATH
                        ORIGINAL_PATH
                        PROVIDER

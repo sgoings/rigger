@@ -3,13 +3,10 @@
 #/ usage:  rerun stubbs:test -m rigger -p setup-clients [--answers <>]
 #
 
-# Helpers
-# -------
 [[ -f ./functions.sh ]] && . ./functions.sh
 
 describe "setup-clients"
 
-source ../lib/functions.sh
 source ../lib/clients.sh
 
 function save-var {
