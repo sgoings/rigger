@@ -1,4 +1,8 @@
 function setup-clients {
+  if [ "${PRODUCT_TYPE}" == "kubernetes" ]; then
+    return 0
+  fi
+
   local version="${1}"
 
   setup-deis-client "${version}"

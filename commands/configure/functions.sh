@@ -1,3 +1,28 @@
+function configure-platform-type {
+  local answer
+  local options=(
+                  "Kubernetes"
+                  "Deis v2 (Heroku workflow on Kubernetes)"
+                  "Deis v1 (Heroku workflow on CoreOS)"
+                )
+
+  choice-prompt "Which product would you like to work with?" options[@] 1 PRODUCT_TYPE
+
+  case ${PRODUCT_TYPE} in
+    1) # kubernetes
+      export PRODUCT_TYPE="kubernetes"
+      ;;
+    2) # deis v2
+      export PRODUCT_TYPE="deis-v2"
+      ;;
+    3) # deis v1
+      export PRODUCT_TYPE="deis-v1"
+      ;;
+  esac
+
+  save-vars PRODUCT_TYPE
+}
+
 function configure-user-type {
   local answer
   local options=(
@@ -103,7 +128,7 @@ function choose-provider {
     declare -a options
 
     local search_return
-    search_return="$(find ${PROVIDER_DIR} -name create -type f)"
+    search_return="$(find ${PROVIDER_DIR//:/ } -name create -type f)"
 
     if [ -z "${search_return:-}" ]; then
       rerun_log fatal "No providers compatible with rigger found in ${PROVIDER_DIR}. :-("
@@ -117,8 +142,9 @@ function choose-provider {
     local answer
     choice-prompt "What cloud provider would you like to use?" options[@] 1 answer
 
+    export PROVIDER_DIR="$(dirname $(dirname ${search_return}))"
     export PROVIDER="${options[$(expr ${answer} - 1)]}"
   fi
 
-  save-vars PROVIDER
+  save-vars PROVIDER PROVIDER_DIR
 }

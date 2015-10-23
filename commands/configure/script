@@ -30,6 +30,12 @@ else
 
   save-vars RIGGER_VARS_FILE DEIS_ID DEIS_ID_DIR DEISCTL_UNITS
 
+  configure-platform-type
+
+  if [ ${PRODUCT_TYPE} == "kubernetes" ]; then
+    source "commands/configure/kubernetes-questions.sh"
+  fi
+
   configure-user-type
 
   configure-go
