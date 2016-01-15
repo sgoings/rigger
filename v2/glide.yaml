@@ -1,0 +1,12 @@
+parent: null
+package: github.com/deis/rigger
+import:
+- package: github.com/spf13/cast
+- package: github.com/spf13/jwalterweatherman
+- package: gopkg.in/fsnotify.v1
+- package: github.com/hashicorp/logutils
+- package: github.com/spf13/cobra
+- package: github.com/BurntSushi/toml
+- package: github.com/kr/pretty
+- package: github.com/spf13/viper
+- package: github.com/magiconair/properties
