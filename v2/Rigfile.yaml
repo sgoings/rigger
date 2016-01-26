@@ -1,0 +1,25 @@
+workflows:
+  - name: provision
+    interface:
+      url: workflows/provision
+    implementations:
+      - name: aws
+        url: providers/aws
+      - name: gcp
+        url: providers/gcp
+      - name: vagrant
+        url: providers/vagrant
+
+#
+# Builds the following UX:
+#
+#   rigger [deis] init <NAME> [--provider=[aws,gcp,vagrant]]
+#   rigger <NAME> [up, down, check, test]
+#
+# To get this to work I need:
+#   - workflows to be able to create commands in a go cli
+#   - implementations to be able to be the underlying callee
+#   - the idea of a rigger workspace with:
+#     - implementation-centric "home" dirs
+#     - implementation-centric bin PATHs
+#

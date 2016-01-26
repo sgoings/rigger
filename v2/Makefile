@@ -1,3 +1,7 @@
+# makeup-managed:begin
+include makeup.mk
+# makeup-managed:end
+
 ifndef GOPATH
 $(error No GOPATH set)
 endif

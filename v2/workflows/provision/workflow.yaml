@@ -1,0 +1,31 @@
+metadata:
+  name: provision
+  description: |
+    This workflow rig provides an easy way to spin up and test a set of cloud
+    based infrastructure using that provider's cli or another tool such as
+    Terraform.
+
+commands:
+  - name: up
+    description: Get a working set of infrastructure to use for other things
+    outputs:
+      vars:
+        - HOST_IP
+
+  - name: down
+    description: Destroy all the infrastructure created in the "up" step
+    inputs:
+      vars:
+        - HOST_IP
+
+  - name: check
+    description: Run a quick healthcheck of the infrastructure
+    inputs:
+      vars:
+        - HOST_IP
+
+  - name: test
+    description: Run a longer test of the infrastructure
+    inputs:
+      vars:
+        - HOST_IP
