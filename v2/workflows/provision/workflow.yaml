@@ -6,13 +6,13 @@ metadata:
     Terraform.
 
 commands:
-  - name: up
+  - name: create
     description: Get a working set of infrastructure to use for other things
     outputs:
       vars:
         - HOST_IP
 
-  - name: down
+  - name: destroy
     description: Destroy all the infrastructure created in the "up" step
     inputs:
       vars:

@@ -15,8 +15,7 @@
 package cmd
 
 import (
-	"fmt"
-
+	"github.com/deis/rigger/v2/environments"
 	"github.com/spf13/cobra"
 )
 
@@ -26,8 +25,7 @@ var listCmd = &cobra.Command{
 	Short: "Lists all workflow instances",
 	Long: `...`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// TODO: Work your own magic here
-		fmt.Println("list called")
+		environments.List()
 	},
 }
 

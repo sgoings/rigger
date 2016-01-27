@@ -10,3 +10,5 @@ import:
 - package: github.com/kr/pretty
 - package: github.com/spf13/viper
 - package: github.com/magiconair/properties
+- package: github.com/mitchellh/cli
+- package: gopkg.in/yaml.v2

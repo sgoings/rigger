@@ -1,0 +1,43 @@
+metadata:
+  name: gcp
+  description: |
+    This file establishes how the workflow will be instantiated for a particular
+    provider
+
+init:
+  vars:
+    - name: GCLOUD_CREDENTIALS_FILE
+      question: "Enter the path to the Google Cloud Authentication JSON file:"
+      default: "${HOME}/.secrets/gcloud.json"
+
+commands:
+  create:
+    script: ./create
+
+  destroy:
+    script: ./destroy
+
+  check:
+    script: ./check
+
+  test:
+    script: ./test
+
+
+tools:
+  - name: helm
+    type: cli
+    install:
+      method: curlbash
+      url: http://get.helm.sh
+
+  - name: google-cloud-sdk
+    type: cli
+    install:
+      method: curlbash
+      url: http://get.google.com
+      env:
+        - GOOGLE_SDK_VAR1
+        - GOOGLE_SDK_VAR2
+      path:
+        - ${RIGGER_TOOL_DIR}/bin
