@@ -3,12 +3,8 @@ workflows:
     interface:
       url: workflows/provision
     implementations:
-      - name: aws
-        url: providers/aws
       - name: gcp
         url: providers/gcp
-      - name: vagrant
-        url: providers/vagrant
 
 #
 # Builds the following UX:
